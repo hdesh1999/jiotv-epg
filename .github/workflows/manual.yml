@@ -21,10 +21,10 @@ jobs:
           python-version: 3.8
       - name: Install dependencies
         run: |
-          python3 -m pip install --upgrade pip
-          sudo pip3 install -r requirements.txt --no-index
+          python -m pip install --upgrade pip
+          pip install --user -r requirements.txt --no-index
       - name: Get EPG Data
-        run: python3 epg.py epg.xml.gz
+        run: python epg.py epg.xml.gz
         env:
           RES_PXY: ${{ secrets.API_KEY }}
           RES_PXY2: ${{ secrets.ACC2 }}
