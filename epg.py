@@ -14,12 +14,10 @@ channel = []
 programme = []
 error = []
 result = []
+proxies = {}
 
 headers = {
     "user-agent": "JioTv"
-}
-
-proxies = {
 }
 
 def retry_on_exception(max_retries, delay=1):
@@ -62,6 +60,7 @@ def get_working_proxy():
         except requests.exceptions.RequestException:
             pass
     if working_proxy:
+        print("Found working proxy "+str(working_proxy))
         return working_proxy
 
 def getEPGData(i, c):
@@ -137,5 +136,9 @@ def genEPG():
         print(f"Took {time.time()-stime:.2f} seconds"+"EPG updated "+str( datetime.now()))
 
 if __name__ == "__main__":
-    get_working_proxy()
+    proxy = get_working_proxy()
+    proxies = {
+        "http": "http://{httpProxy}".format(httpProxy=proxy),
+        "https": "http://{httpProxy}".format(httpProxy=proxy),
+    }
     genEPG()
