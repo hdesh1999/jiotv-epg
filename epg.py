@@ -3,10 +3,8 @@ from requests.exceptions import HTTPError
 from datetime import datetime
 import xmltodict
 import time
-import sys
 import gzip
 from concurrent.futures.thread import ThreadPoolExecutor
-import os
 
 API = "http://jiotvapi.cdn.jio.com/apis"
 IMG = "http://jiotv.catchup.cdn.jio.com/dare_images"
