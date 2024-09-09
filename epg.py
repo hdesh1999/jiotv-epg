@@ -42,7 +42,7 @@ def retry_on_exception(max_retries, delay=1):
     return decorator
 
 
-@retry_on_exception(max_retries=10, delay=5)
+@retry_on_exception(max_retries=2, delay=5)
 def get_working_proxy():
     response = requests.get(PROXY_API)
     response.raise_for_status()
