@@ -1,7 +1,3 @@
 requests
-HTTPError
 datetime
 xmltodict
-time
-gzip
-ThreadPoolExecutor
