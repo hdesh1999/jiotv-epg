@@ -20,7 +20,7 @@ headers = {
 def getEPGData(i, c):
     global channel, programme, error, result, API, IMG
     # 1 day future , today and two days past to play catchup
-    for day in range(-1, 2):
+    for day in range(-1, 1):
         try:
             resp = requests.get(f"{API}/v1.3/getepg/get", params={"offset": day,
                                 "channel_id": c['channel_id']},headers=headers).json()
