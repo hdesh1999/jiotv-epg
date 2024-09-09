@@ -8,7 +8,12 @@ from concurrent.futures.thread import ThreadPoolExecutor
 
 API = "http://jiotvapi.cdn.jio.com/apis"
 IMG = "http://jiotv.catchup.cdn.jio.com/dare_images"
-PROXY_API = "https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http&timeout=10000&country=IN&ssl=IN&anonymity=IN"
+# PROXY_API = "https://api.proxyscrape.com/v3/free-proxy-list/get?request=displayproxies&country=in&protocol=http&proxy_format=ipport&format=text&timeout=20000"
+PROXY_API = "https://free.proxy-sale.com/api/front/main/proxy/list"
+body = {
+    "count": 100,
+    "country": "India"
+}
 
 channel = []
 programme = []
@@ -20,7 +25,7 @@ headers = {
     "user-agent": "JioTv"
 }
 
-def retry_on_exception(max_retries, delay=1):
+def retryOnException(max_retries, delay=1):
     def decorator(func):
         def wrapper(*args, **kwargs):
             retries = 0
@@ -40,13 +45,16 @@ def retry_on_exception(max_retries, delay=1):
     return decorator
 
 
-@retry_on_exception(max_retries=2, delay=5)
-def get_working_proxy():
-    response = requests.get(PROXY_API)
+@retryOnException(max_retries=2, delay=5)
+def getWorkingProxy():
+    response = requests.post(PROXY_API,json=body)
     response.raise_for_status()
-    proxies = response.text.strip().split("\r\n")
+    # proxies = response.text.strip().split("\r\n")
+    proxies = response.json()
     working_proxy = None
     for prx in proxies:
+        prx = prx["ip"]
+        print("Testing "+str(prx)+" proxy")
         tproxies = {
             "http": "http://{prx}".format(prx=prx),
         }
@@ -136,7 +144,7 @@ def genEPG():
         print(f"Took {time.time()-stime:.2f} seconds"+"EPG updated "+str( datetime.now()))
 
 if __name__ == "__main__":
-    proxy = get_working_proxy()
+    proxy = getWorkingProxy()
     proxies = {
         "http": "http://{httpProxy}".format(httpProxy=proxy),
         "https": "http://{httpProxy}".format(httpProxy=proxy),
