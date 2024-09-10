@@ -19,7 +19,6 @@ channel = []
 programme = []
 error = []
 result = []
-proxies = {}
 
 headers = {
     "user-agent": "JioTv"
