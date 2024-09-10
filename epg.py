@@ -155,8 +155,6 @@ def genEPG():
 
 if __name__ == "__main__":
     proxy = getWorkingProxy()
-    if not proxy:
-        
     global proxies
     proxies = {
         "http": "http://{httpProxy}".format(httpProxy=proxy),
