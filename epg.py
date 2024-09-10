@@ -86,7 +86,7 @@ def getEPGData(i, c):
     global channel, programme, error, result, API, IMG
     for day in range(-1, 1):
         try:
-            resp = requests.get(f"{API}/v1.3/getepg/get", params={"offset": day, "channel_id": c['channel_id']},headers=headers,proxies=proxies).json()
+            resp = requests.get(f"{API}/v1.3/getepg/get", params={"offset": day, "channel_id": c['channel_id']},headers=headers,proxies=proxies,timeout=5)).json()
             day == 0 and channel.append({
                 "@id": c['channel_id'],
                 "display-name": c['channel_name'],
@@ -131,7 +131,7 @@ def genEPG():
     stime = time.time()
     try:
         resp = requests.get(
-            f"{API}/v3.0/getMobileChannelList/get/?langId=6&devicetype=phone&os=android&usertype=JIO&version=353",headers=headers,proxies=proxies)
+            f"{API}/v3.0/getMobileChannelList/get/?langId=6&devicetype=phone&os=android&usertype=JIO&version=353",headers=headers,proxies=proxies,timeout=5))
         print(resp)
         resp.raise_for_status()
         raw = resp.json()
