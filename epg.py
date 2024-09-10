@@ -149,6 +149,5 @@ if __name__ == "__main__":
     global proxies
     proxies = {
         "http": "http://{httpProxy}".format(httpProxy=proxy),
-        "https": "http://{httpProxy}".format(httpProxy=proxy),
     }
     genEPG()
