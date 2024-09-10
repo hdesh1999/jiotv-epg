@@ -60,7 +60,7 @@ def getWorkingProxy():
         }
         try:
             test_url = f"{API}/v3.0/getMobileChannelList/get/?langId=6&devicetype=phone&os=android&usertype=JIO&version=353"
-            response = requests.get(test_url, proxies=tproxies, headers=heasers, timeout=5)
+            response = requests.get(test_url, proxies=tproxies, headers=headers, timeout=5)
             print(response)
             if response.status_code == 200:
                 working_proxy = prx
