@@ -67,6 +67,9 @@ def getWorkingProxy():
             test_url = f"{API}/v3.0/getMobileChannelList/get/?langId=6&devicetype=phone&os=android&usertype=JIO&version=353"
             response = requests.get(test_url, proxies=tproxies, headers=headers, timeout=5)
             print(response)
+            resp = f"{API}/v1.3/getepg/get", params={"offset": 0, "channel_id": 143}
+            response = requests.get(test_url, proxies=tproxies, headers=headers, timeout=5)
+            print(response)
             if response.status_code == 200:
                 working_proxy = prx
                 break
