@@ -141,8 +141,10 @@ def genEPG():
         code = exc.response.status_code
         print(exc)
         print(f'error calling mobilecahnnelList {code}')
+        raise NoProxyFound()
     except Exception as e:
         print(e)
+        raise NoProxyFound()
     else:
         result = raw.get("result")
         print(str(len(result))+" channels found")
