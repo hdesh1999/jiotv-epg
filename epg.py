@@ -115,6 +115,7 @@ def getEPGData(i, c):
             
 
 def genEPG():
+    print("Start epg generation")
     stime = time.time()
     try:
         resp = requests.get(
