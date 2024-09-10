@@ -68,7 +68,7 @@ def getWorkingProxy():
             response = requests.get(test_url, proxies=tproxies, headers=headers, timeout=5)
             print(response)
             resp = f"{API}/v1.3/getepg/get"
-            response = requests.get(test_url, params={"offset": 0, "channel_id": 143} proxies=tproxies, headers=headers, timeout=5)
+            response = requests.get(test_url, params={"offset": 0, "channel_id": 143}, proxies=tproxies, headers=headers, timeout=5)
             print(response)
             if response.status_code == 200:
                 working_proxy = prx
