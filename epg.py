@@ -49,7 +49,7 @@ def retryOnException(max_retries, delay=1):
     return decorator
 
 
-@retryOnException(max_retries=10, delay=10)
+@retryOnException(max_retries=3, delay=300)
 def getWorkingProxy():
     print("Started get proxy")
     for PROXY_API in PROXY_APIS:
