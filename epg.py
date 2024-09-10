@@ -46,6 +46,7 @@ def retryOnException(max_retries, delay=1):
 
 @retryOnException(max_retries=2, delay=5)
 def getWorkingProxy():
+    print("Started get proxy")
     response = requests.post(PROXY_API,json=body)
     response.raise_for_status()
     # proxies = response.text.strip().split("\r\n")
@@ -60,7 +61,7 @@ def getWorkingProxy():
         try:
             test_url = f"{API}/v3.0/getMobileChannelList/get/?langId=6&devicetype=phone&os=android&usertype=JIO&version=353"
             response = requests.get(test_url, proxies=tproxies, headers=heasers, timeout=5)
-
+            print(response)
             if response.status_code == 200:
                 working_proxy = prx
                 break
