@@ -120,6 +120,7 @@ def genEPG():
     try:
         resp = requests.get(
             f"{API}/v3.0/getMobileChannelList/get/?langId=6&devicetype=phone&os=android&usertype=JIO&version=353",headers=headers,proxies=proxies)
+        print(resp)
         resp.raise_for_status()
         raw = resp.json()
     except HTTPError as exc:
