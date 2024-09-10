@@ -8,11 +8,11 @@ from concurrent.futures.thread import ThreadPoolExecutor
 
 API = "http://jiotvapi.cdn.jio.com/apis"
 IMG = "http://jiotv.catchup.cdn.jio.com/dare_images"
-# PROXY_API = "https://api.proxyscrape.com/v3/free-proxy-list/get?request=displayproxies&country=in&protocol=http&proxy_format=ipport&format=text&timeout=20000"
-PROXY_API = "https://free.proxy-sale.com/api/front/main/proxy/list"
+PROXY_APIS = [
+    "https://api.proxyscrape.com/v3/free-proxy-list/get?request=displayproxies&country=in&protocol=http&proxy_format=protocolipport&format=json&timeout=10010"
+]
+
 body = {
-    "count": 100,
-    "country": "India"
 }
 
 channel = []
@@ -49,44 +49,46 @@ def retryOnException(max_retries, delay=1):
     return decorator
 
 
-@retryOnException(max_retries=2, delay=5)
+@retryOnException(max_retries=10, delay=10)
 def getWorkingProxy():
     print("Started get proxy")
-    response = requests.post(PROXY_API,json=body)
-    response.raise_for_status()
-    # proxies = response.text.strip().split("\r\n")
-    proxies = response.json()
-    working_proxy = None
-    for prx in proxies:
-        prx = prx["ip"]
-        print("Testing "+str(prx)+" proxy")
-        tproxies = {
-            "http": "http://{prx}".format(prx=prx),
-        }
-        try:
-            test_url = f"{API}/v3.0/getMobileChannelList/get/?langId=6&devicetype=phone&os=android&usertype=JIO&version=353"
-            response = requests.get(test_url, proxies=tproxies, headers=headers, timeout=5)
-            print(response)
-            resp = f"{API}/v1.3/getepg/get"
-            response = requests.get(test_url, params={"offset": 0, "channel_id": 143}, proxies=tproxies, headers=headers, timeout=5)
-            print(response)
-            if response.status_code == 200:
-                working_proxy = prx
-                break
-        except requests.exceptions.RequestException:
-            pass
-    if working_proxy:
-        print("Found working proxy "+str(working_proxy))
-        return working_proxy
-    else:
-        print("No working proxy found")
-        raise NoProxyFound()
+    for PROXY_API in PROXY_APIS:
+        response = requests.post(PROXY_API,json=body)
+        response.raise_for_status()
+        proxies = response.json()
+        working_proxy = None
+        if "proxies" in proxies:
+            proxies = proxies["proxies"]
+        for prx in proxies:
+            prx = prx["ip"]
+            print("Testing "+str(prx)+" proxy")
+            tproxies = {
+                "http": "http://{prx}".format(prx=prx),
+            }
+            try:
+                test_url = f"{API}/v3.0/getMobileChannelList/get/?langId=6&devicetype=phone&os=android&usertype=JIO&version=353"
+                response = requests.get(test_url, proxies=tproxies, headers=headers, timeout=10)
+                print(response)
+                test_url = f"{API}/v1.3/getepg/get"
+                response = requests.get(test_url, params={"offset": 0, "channel_id": 143}, proxies=tproxies, headers=headers, timeout=10)
+                print(response)
+                if response.status_code == 200:
+                    working_proxy = prx
+                    break
+            except requests.exceptions.RequestException:
+                pass
+        if working_proxy:
+            print("Found working proxy "+str(working_proxy))
+            return working_proxy
+        else:
+            print("No working proxy found")
+            raise NoProxyFound()
 
 def getEPGData(i, c):
     global channel, programme, error, result, API, IMG
     for day in range(-1, 1):
         try:
-            resp = requests.get(f"{API}/v1.3/getepg/get", params={"offset": day, "channel_id": c['channel_id']},headers=headers,proxies=proxies,timeout=5).json()
+            resp = requests.get(f"{API}/v1.3/getepg/get", params={"offset": day, "channel_id": c['channel_id']},headers=headers,proxies=proxies,timeout=10).json()
             day == 0 and channel.append({
                 "@id": c['channel_id'],
                 "display-name": c['channel_name'],
@@ -131,9 +133,9 @@ def genEPG():
     stime = time.time()
     try:
         resp = requests.get(
-            f"{API}/v3.0/getMobileChannelList/get/?langId=6&devicetype=phone&os=android&usertype=JIO&version=353",headers=headers,proxies=proxies,timeout=5)
-        print(resp)
+            f"{API}/v3.0/getMobileChannelList/get/?langId=6&devicetype=phone&os=android&usertype=JIO&version=353",headers=headers,proxies=proxies,timeout=10)
         resp.raise_for_status()
+        print(resp)
         raw = resp.json()
     except HTTPError as exc:
         code = exc.response.status_code
@@ -143,6 +145,7 @@ def genEPG():
         print(e)
     else:
         result = raw.get("result")
+        print(str(len(result))+" channels found")
         with ThreadPoolExecutor() as e:
             e.map(getEPGData, range(len(result)), result)
         epgdict = {"tv": {
