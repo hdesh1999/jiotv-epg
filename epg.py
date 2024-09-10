@@ -24,6 +24,11 @@ headers = {
     "user-agent": "JioTv"
 }
 
+class NoProxyFound(Exception):
+    def _init_(self):
+        self.message = "No working proxy found"
+        super()._init_(self.message)
+
 def retryOnException(max_retries, delay=1):
     def decorator(func):
         def wrapper(*args, **kwargs):
@@ -70,6 +75,9 @@ def getWorkingProxy():
     if working_proxy:
         print("Found working proxy "+str(working_proxy))
         return working_proxy
+    else:
+        print("No working proxy found")
+        raise NoProxyFound()
 
 def getEPGData(i, c):
     global channel, programme, error, result, API, IMG
@@ -147,6 +155,8 @@ def genEPG():
 
 if __name__ == "__main__":
     proxy = getWorkingProxy()
+    if not proxy:
+        
     global proxies
     proxies = {
         "http": "http://{httpProxy}".format(httpProxy=proxy),
