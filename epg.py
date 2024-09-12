@@ -20,6 +20,7 @@ programme = []
 error = []
 result = []
 fetchedChannels = []
+unfetchedChanels = []
 
 headers = {
     "user-agent": "JioTv"
@@ -86,7 +87,7 @@ def getWorkingProxy():
             raise NoProxyFound()
 
 def getEPGData(i, c):
-    global channel, programme, error, result, API, IMG, fetchedChannels
+    global channel, programme, error, result, API, IMG, fetchedChannels, unfetchedChannels 
     fetchedEpg = 0
     for day in range(-1, 2):
         try:
@@ -132,11 +133,13 @@ def getEPGData(i, c):
             fetchedEpg += 1
     if fetchedEpg == 3:
         fetchedChannels.append(c['channel_id'])
+    else:
+        unfetchedChanels.append(c['channel_id'])
 
 def genEPG():
     print("Start epg generation")
     stime = time.time()
-    global fetchedChannels
+    global fetchedChannels, unfetchedChannels 
     try:
         resp = requests.get(
             f"{API}/v3.0/getMobileChannelList/get/?langId=6&devicetype=phone&os=android&usertype=JIO&version=353",headers=headers,proxies=proxies,timeout=10)
@@ -169,6 +172,8 @@ def genEPG():
             print(f"Took {time.time()-stime:.2f} seconds"+"EPG updated "+str( datetime.now()))
         else:
             print("Fetcehed "+str(len(fetchedChannels))+" channels")
+            print("Could not fetch following channels")
+            print("/n".join(unfetchedChannels))
 
 if __name__ == "__main__":
     proxy = getWorkingProxy()
