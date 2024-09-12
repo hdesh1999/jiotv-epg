@@ -136,6 +136,7 @@ def getEPGData(i, c):
 def genEPG():
     print("Start epg generation")
     stime = time.time()
+    global fetchedChannels
     try:
         resp = requests.get(
             f"{API}/v3.0/getMobileChannelList/get/?langId=6&devicetype=phone&os=android&usertype=JIO&version=353",headers=headers,proxies=proxies,timeout=10)
