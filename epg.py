@@ -19,7 +19,7 @@ channel = []
 programme = []
 error = []
 result = []
-fetchedChannels = 0
+fetchedChannels = []
 
 headers = {
     "user-agent": "JioTv"
@@ -131,7 +131,7 @@ def getEPGData(i, c):
         else:
             fetchedEpg += 1
     if fetchedEpg == 3:
-        fetchedChannels += 1
+        fetchedChannels.append(c['channel_id'])
 
 def genEPG():
     print("Start epg generation")
@@ -161,12 +161,14 @@ def genEPG():
             "programme": programme
         }}
         epgxml = xmltodict.unparse(epgdict, pretty=True)
-        if fetchedChannels == len(result):
+        if len(fetchedChannels) == len(result):
             with open("epg.xml.gz", 'wb+') as f:
                 f.write(gzip.compress(epgxml.encode('utf-8')))
             if len(error) > 0:
                 print(f'error in {error}')
             print(f"Took {time.time()-stime:.2f} seconds"+"EPG updated "+str( datetime.now()))
+        else:
+            print("Fetcehed "+str(len(fetchedChannels))+" channels")
 
 if __name__ == "__main__":
     proxy = getWorkingProxy()
