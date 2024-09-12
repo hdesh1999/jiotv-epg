@@ -164,7 +164,7 @@ def genEPG():
             "programme": programme
         }}
         epgxml = xmltodict.unparse(epgdict, pretty=True)
-        if len(fetchedChannels) == len(result):
+        if len(fetchedChannels) >= 1000:
             with open("epg.xml.gz", 'wb+') as f:
                 f.write(gzip.compress(epgxml.encode('utf-8')))
             if len(error) > 0:
