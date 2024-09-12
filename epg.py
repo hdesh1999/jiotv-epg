@@ -19,6 +19,7 @@ channel = []
 programme = []
 error = []
 result = []
+fetchedChannels = 0
 
 headers = {
     "user-agent": "JioTv"
@@ -85,7 +86,8 @@ def getWorkingProxy():
             raise NoProxyFound()
 
 def getEPGData(i, c):
-    global channel, programme, error, result, API, IMG
+    global channel, programme, error, result, API, IMG, fetchedChannels
+    fetchedEpg = 0
     for day in range(-1, 2):
         try:
             resp = requests.get(f"{API}/v1.3/getepg/get", params={"offset": day, "channel_id": c['channel_id']},headers=headers,proxies=proxies,timeout=10).json()
@@ -126,7 +128,10 @@ def getEPGData(i, c):
             print(f"Retry failed (Retry Count: {retry_count+1}): {e} {c['channel_name']}")
             retry_count += 1
             error.append(c['channel_id'])
-            
+        else:
+            fetchedEpg += 1
+    if fetchedEpg == 3:
+        fetchedChannels += 1
 
 def genEPG():
     print("Start epg generation")
@@ -155,11 +160,12 @@ def genEPG():
             "programme": programme
         }}
         epgxml = xmltodict.unparse(epgdict, pretty=True)
-        with open("epg.xml.gz", 'wb+') as f:
-            f.write(gzip.compress(epgxml.encode('utf-8')))
-        if len(error) > 0:
-            print(f'error in {error}')
-        print(f"Took {time.time()-stime:.2f} seconds"+"EPG updated "+str( datetime.now()))
+        if fetchedChannels == len(result):
+            with open("epg.xml.gz", 'wb+') as f:
+                f.write(gzip.compress(epgxml.encode('utf-8')))
+            if len(error) > 0:
+                print(f'error in {error}')
+            print(f"Took {time.time()-stime:.2f} seconds"+"EPG updated "+str( datetime.now()))
 
 if __name__ == "__main__":
     proxy = getWorkingProxy()
